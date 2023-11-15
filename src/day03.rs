@@ -1,18 +1,13 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn search_group(group: &[&str]) -> char {
-    let mut map: HashMap<char, usize> = HashMap::new();
-
-    // might be able to make this part more functional
-    for item in group {
-        for char in item.chars() {
-            *map.entry(char).or_insert(0) += 1;
-        }
-    }
-    
-    *map.iter()
-        .max_by(|a, b| a.1.cmp(&b.1))
-        .map(|(k, _v)| k)
+    *group
+        .iter()
+        .map(|r| r.chars().collect::<HashSet<char>>())
+        .reduce(|a, b| a.intersection(&b).copied().collect::<HashSet<char>>())
+        .unwrap()
+        .iter()
+        .next()
         .unwrap()
 }
 
