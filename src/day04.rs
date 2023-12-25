@@ -1,9 +1,9 @@
-pub fn fully_contains(pair: &Vec<(u8, u8)>) -> bool {
+pub fn fully_contains(pair: &[(u8, u8)]) -> bool {
     pair[0].0 <= pair[1].0 && pair[0].1 >= pair[1].1
     || pair[1].0 <= pair[0].0 && pair[1].1 >= pair[0].1
 }
 
-pub fn partially_contains(pair: &Vec<(u8, u8)>) -> bool {
+pub fn partially_contains(pair: &[(u8, u8)]) -> bool {
     pair[0].0 <= pair[1].0 && pair[0].1 >= pair[1].0
     || pair[0].0 <= pair[1].1 && pair[0].1 >= pair[1].1
 
@@ -39,18 +39,18 @@ mod tests {
     #[test]
     fn fully_contains_1() {
         let vector = vec!((1, 4), (2, 3));
-        assert!(fully_contains(vector));
+        assert!(fully_contains(&vector));
     }
 
     #[test]
     fn fully_contains_2() {
         let vector = vec!((2, 8), (3, 7));
-        assert!(fully_contains(vector));
+        assert!(fully_contains(&vector));
     }
 
     #[test]
     fn fully_contains_3() {
         let vector = vec!((6, 6), (4, 6));
-        assert!(fully_contains(vector));
+        assert!(fully_contains(&vector));
     }
 }
