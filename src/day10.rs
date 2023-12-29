@@ -37,15 +37,14 @@ pub fn run(input: &str) {
 
     for (i, value) in x_state.iter().enumerate() {
         let horizontal = (i as i32) % 40;
+        if i != 0 && horizontal == 0 {
+            println!();
+        }
 
         if (value-1..=value+1).contains(&horizontal) {
             print!("#");
         } else {
             print!(" ");
-        }
-
-        if horizontal == 0 {
-            println!();
         }
     }
 
