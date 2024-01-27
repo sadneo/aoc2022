@@ -3,8 +3,12 @@ use std::{env, fs};
 fn main() {
     let args: Vec<String> = env::args().collect();
     let days: Vec<u32> = match args.len() {
-        1 => (1..=10).collect(),
-        _ => args.iter().skip(1).map(|day| day.parse().unwrap()).collect(),
+        1 => (1..=11).collect(),
+        _ => args
+            .iter()
+            .skip(1)
+            .map(|day| day.parse().unwrap())
+            .collect(),
     };
 
     for day in &days {
@@ -28,6 +32,7 @@ fn main() {
             8 => aoc2022::day08::run,
             9 => aoc2022::day09::run,
             10 => aoc2022::day10::run,
+            11 => aoc2022::day11::run,
             _ => unreachable!(),
         };
 
