@@ -157,16 +157,3 @@ fn explore(tile_map: TileMap) -> Option<u32> {
     }
     None
 }
-
-fn print_mountain(tile_map: &TileMap) {
-    for (ix, row) in tile_map.area.iter().enumerate() {
-        for (iy, tile) in row.iter().enumerate() {
-            match tile {
-                Tile::Start => print!("Start!"),
-                Tile::End => print!("End!  "),
-                Tile::Elevation(n) => print!("{:02}{:03}{}", ix, iy, (n + b'a') as char),
-            }
-        }
-        println!();
-    }
-}
