@@ -1,3 +1,5 @@
+use core::cmp::Ordering;
+
 #[derive(Debug, PartialEq)]
 enum Token {
     LeftBracket,
@@ -5,7 +7,7 @@ enum Token {
     Integer(u8),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Value {
     Integer(u8),
     List(Vec<Value>),
@@ -20,9 +22,9 @@ pub fn run(input: &str) {
 
             let lhs = parse(pair[0]);
             let rhs = parse(pair[1]);
-            println!("{:?}\n{:?}", rhs, lhs);
-            if compare(lhs, rhs) {
-                Some(index)
+
+            if compare(&lhs, &rhs).expect("Should reach a conclusion on order") {
+                Some(index + 1)
             } else {
                 None
             }
@@ -30,24 +32,41 @@ pub fn run(input: &str) {
         .sum();
 
     println!("{}", result1);
+
+    let mut values: Vec<Value> = input
+        .split('\n')
+        .filter_map(|line| {
+            if line.is_empty() {
+                return None;
+            }
+            Some(parse(line))
+        })
+        .collect();
+
+    values.push(parse("[[2]]"));
+    values.push(parse("[[6]]"));
+
+    values.sort_by(|lhs, rhs| {
+        let value = compare(lhs, rhs).expect("Should reach a conclusion on order");
+        match value {
+            true => Ordering::Less,
+            false => Ordering::Greater,
+        }
+    });
+
+    let v1 = values.iter().position(|x| *x == parse("[[2]]")).unwrap() + 1;
+    let v2 = values.iter().position(|x| *x == parse("[[6]]")).unwrap() + 1;
+
+    println!("{}", v1 * v2);
 }
 
 fn parse(line: &str) -> Value {
     let tokens = tokenize(line);
-    parse_brackets(&tokens, 0)
+    let (value, _) = parse_brackets(&tokens, 0);
+    value
 }
 
-/*
-As you go through the tokens,
-Left bracket creates new vector, and anything that passes in until a right bracket is put into this vector.
-After a left bracket,
-- A comma is a syntax error.
-- An integer is added to the vector.
-- A right bracket closes the vector and returns
-- A left bracket creates a new function
-*/
-
-fn parse_brackets(tokens: &Vec<Token>, mut index: usize) -> Value {
+fn parse_brackets(tokens: &Vec<Token>, mut index: usize) -> (Value, usize) {
     assert!(tokens[index] == Token::LeftBracket);
     index += 1;
     let mut vector: Vec<Value> = vec![];
@@ -58,11 +77,12 @@ fn parse_brackets(tokens: &Vec<Token>, mut index: usize) -> Value {
                 index += 1;
             }
             Token::LeftBracket => {
-                parse_brackets(tokens, index);
-                index += 1;
+                let (value, i) = parse_brackets(tokens, index);
+                vector.push(value);
+                index = i + 1;
             }
             Token::RightBracket => {
-                return Value::List(vector);
+                return (Value::List(vector), index);
             }
         }
     }
@@ -92,6 +112,37 @@ fn tokenize(line: &str) -> Vec<Token> {
     tokens
 }
 
-fn compare(lhs: Value, rhs: Value) -> bool {
-    true
+fn compare(lhs: &Value, rhs: &Value) -> Option<bool> {
+    match (lhs, rhs) {
+        (Value::Integer(i), Value::Integer(j)) => match i.cmp(j) {
+            Ordering::Less => Some(true),
+            Ordering::Greater => Some(false),
+            Ordering::Equal => None,
+        },
+        (Value::List(v1), Value::List(v2)) => compare_lists(v1, v2),
+        (Value::Integer(i), Value::List(v)) => {
+            let new_v = vec![Value::Integer(*i)];
+            compare_lists(&new_v, v)
+        }
+        (Value::List(v), Value::Integer(i)) => {
+            let new_v = vec![Value::Integer(*i)];
+            compare_lists(v, &new_v)
+        }
+    }
+}
+
+fn compare_lists(lhs: &[Value], rhs: &[Value]) -> Option<bool> {
+    let len = lhs.len().max(rhs.len());
+    for i in 0..len {
+        match (lhs.get(i), rhs.get(i)) {
+            (Some(lhv), Some(rhv)) => match compare(lhv, rhv) {
+                Some(result) => return Some(result),
+                None => continue,
+            },
+            (None, Some(_)) => return Some(true),
+            (Some(_), None) => return Some(false),
+            (None, None) => unreachable!(),
+        };
+    }
+    None
 }
