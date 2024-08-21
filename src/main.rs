@@ -3,7 +3,7 @@ use std::{env, fs};
 fn main() {
     let args: Vec<String> = env::args().collect();
     let days: Vec<u32> = match args.len() {
-        1 => (1..=15).collect(),
+        1 => (1..=16).collect(),
         _ => args
             .iter()
             .skip(1)
@@ -36,7 +36,7 @@ fn main() {
             12 => aoc2022::day12::run,
             13 => aoc2022::day13::run,
             14 => aoc2022::day14::run,
-            15 => aoc2022::day15::run,
+            16 => aoc2022::day16::run,
             _ => unreachable!(),
         };
 
