@@ -58,7 +58,7 @@ fn solve2(sensor_beacons: &[(i64, i64, i64, i64)]) -> i64 {
             let rx = distance + 1 - ry.abs();
             
             let y = *sy + ry;
-            if y < 0 || y > TUNING_NUMBER {
+            if !(0..=TUNING_NUMBER).contains(&y) {
                 continue;
             }
 
